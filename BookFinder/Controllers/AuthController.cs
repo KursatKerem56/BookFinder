@@ -6,7 +6,7 @@ using System.Data;
 using Dapper;
 using BookFinder.Dtos;
 
-public class LoginController(IDbConnection db) : Controller
+public class AuthController(IDbConnection db) : Controller
 {
   private readonly IDbConnection _db = db;
 
@@ -15,7 +15,7 @@ public class LoginController(IDbConnection db) : Controller
     return View();
   }
 
-  [HttpPost("login")]
+  [HttpPost("auth/login")]
   public async Task<IActionResult> Login([FromBody] LoginDto model)
   {
     if (!ModelState.IsValid) return BadRequest(ModelState);
