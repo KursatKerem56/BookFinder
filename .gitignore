@@ -23,10 +23,6 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-# Exception: Include appsettings files
-!**/appsettings.json
-!**/appsettings.Development.json
-
 # .NET Core
 project.lock.json
 project.fragment.lock.json
@@ -56,3 +52,6 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+BookFinder/appsettings.json
+BookFinder/appsettings.Development.json
