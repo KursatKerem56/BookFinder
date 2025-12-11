@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BookFinder.Dtos
 
 {
-  public class LoginDto
+  public class RegisterDto
   {
     [Required]
     [RegularExpression(@"^\S+$", ErrorMessage = "Username cannot contain spaces.")]
