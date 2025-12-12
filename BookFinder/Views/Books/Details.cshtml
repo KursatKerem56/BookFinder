@@ -1,0 +1,10 @@
+<h1>@ViewBag.Book.Title</h1>
+<h3>by @ViewBag.Book.Author</h3>
+
+<div>@ViewBag.Book</div>
+
+@for (var i = 0; i < ViewBag.Reviews.Count; i++)
+{
+  var review = ViewBag.Reviews[i];
+  var comments = review.Comments;
+}

@@ -1,6 +1,11 @@
-<h1>@ViewBag.Message</h1>
-
-@foreach (var item in ViewBag.Result)
+<h3>Top Ten Books</h3>
+@foreach (var item in ViewBag.TopTenBooks)
 {
-  <p>@item.username</p>
+  <p>@item.Title</p>
+}
+
+<h3>All Books</h3>
+@foreach (var item in ViewBag.Books)
+{
+  <p>@item.title</p>
 }

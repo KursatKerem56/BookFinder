@@ -10,12 +10,13 @@ public class HomeController(IDbConnection db) : Controller
   {
     _db.Open();
 
-    var result = await _db.QueryAsync("SELECT * FROM \"Users\"");
+    var topTenBooks = await _db.QueryAsync("SELECT * FROM findtoptenbooks()");
+    var books = await _db.QueryAsync("SELECT * FROM \"Books\"");
 
     _db.Close();
 
-    ViewBag.Message = "Welcome to BookFinder! (Home)";
-    ViewBag.Result = result;
+    ViewBag.TopTenBooks = topTenBooks;
+    ViewBag.Books = books;
 
     return View();
   }
