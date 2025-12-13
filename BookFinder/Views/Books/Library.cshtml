@@ -1,0 +1,22 @@
+{
+  @Layout = "Navbar";     @* The navbar of the site. For details go to Views/Shared/Navbar.cshmtl *@
+}
+
+@* This is users library. User show their books on this page. User can add, delete, update operation on a book in the list. *@
+
+<h1>Library Page</h1>
+
+@foreach (var item in ViewBag.Library)
+{
+  <div>
+    <hr>
+    <div>BookId: @item.BookId</div>
+    <div>Title: @item.Title</div>
+    <div>imageURL: @item.imageURL</div>
+    <div>Progress: @item.Progress</div>
+    <div>Score: @item.Score</div>    @* Warning: Score should be between 1 and 10  *@
+    <div>Condition: @item.Condition</div>   @* Warning: this is not a string type element. This is a int. 1 = reading, 2 = Completed, 3 = Plan to Read,  4 = Dropped,  5 = On Hold. Put a radio button thing, let user select 5 of them and get the int type element from it. *@
+    <div>UpdateDate: @item.UpdateDate</div>
+    <hr>
+  </div>
+}

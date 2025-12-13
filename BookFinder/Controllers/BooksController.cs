@@ -179,4 +179,101 @@ public class BooksController(IDbConnection db) : Controller
 
     return Ok($"Deleted comment with ID: {model.CommentId}");
   }
+
+  [HttpGet("books/library/{userId}")]
+  public async Task<IActionResult> Library(string userId)
+  {
+    if (string.IsNullOrEmpty(userId))
+    {
+      return BadRequest("UserId is required.");
+    }
+
+    var foundLibrary = await _db.QueryAsync($"SELECT * FROM finduserlibrary({userId})");
+    if (foundLibrary == null || !foundLibrary.Any())
+    {
+      return NotFound("Library not found.");
+    }
+
+    ViewBag.Library = foundLibrary;
+
+    return View();
+  }
+
+  [HttpPost("books/library/add")]
+  public async Task<IActionResult> AddToLibrary([FromBody] AddToLibraryDto model)
+  {
+    var UserId = model.UserId;
+    var BookId = model.BookId;
+    var Progress = model.Progress;
+    var Score = model.Score;
+    var Condition = model.Condition;
+
+    var foundUser = await _db.QueryFirstOrDefaultAsync("SELECT * FROM \"Users\" WHERE \"userId\" = @UserId", new { UserId });
+    if (foundUser == null)
+    {
+      return NotFound("User not found.");
+    }
+
+    var foundBook = await _db.QueryFirstOrDefaultAsync("SELECT * FROM \"Books\" WHERE \"bookId\" = @BookId", new { BookId });
+    if (foundBook == null)
+    {
+      return NotFound("Book not found.");
+    }
+
+    var sql = $"INSERT INTO \"UserLibrary\" (\"userId\", \"bookId\", \"progressPages\", \"score\", \"statusid\") VALUES ({UserId}, {BookId}, {Progress}, {Score}, {Condition})";
+    await _db.ExecuteAsync(sql);
+
+    return Ok($"Added book {foundBook.title} to user {foundUser.username}'s library.");
+  }
+
+  [HttpPost("books/library/update")]
+  public async Task<IActionResult> UpdateLibraryEntry([FromBody] UpdateLibraryDto model)
+  {
+    var UserId = model.UserId;
+    var BookId = model.BookId;
+    var Progress = model.Progress;
+    var Score = model.Score;
+    var Condition = model.Condition;
+
+    var foundUser = await _db.QueryFirstOrDefaultAsync("SELECT * FROM \"Users\" WHERE \"userId\" = @UserId", new { UserId });
+    if (foundUser == null)
+    {
+      return NotFound("User not found.");
+    }
+
+    var foundBook = await _db.QueryFirstOrDefaultAsync("SELECT * FROM \"Books\" WHERE \"bookId\" = @BookId", new { BookId });
+    if (foundBook == null)
+    {
+      return NotFound("Book not found.");
+    }
+
+    var sql = $"UPDATE \"UserLibrary\" SET \"progressPages\" = {Progress}, \"score\" = {Score}, \"statusid\" = {Condition}, \"updateDate\" = CURRENT_TIMESTAMP WHERE \"userId\" = {UserId} AND \"bookId\" = {BookId}";
+    await _db.ExecuteAsync(sql);
+
+    return Ok($"Updated library entry for book {foundBook.title} in user {foundUser.username}'s library.");
+  }
+
+  [HttpPost("books/library/delete")]
+  public async Task<IActionResult> DeleteFromLibrary([FromBody] DeleteLibraryDto model)
+  {
+    var UserId = model.UserId;
+    var BookId = model.BookId;
+
+    var foundUser = await _db.QueryFirstOrDefaultAsync("SELECT * FROM \"Users\" WHERE \"userId\" = @UserId", new { UserId });
+    if (foundUser == null)
+    {
+      return NotFound("User not found.");
+    }
+
+    var foundBook = await _db.QueryFirstOrDefaultAsync("SELECT * FROM \"Books\" WHERE \"bookId\" = @BookId", new { BookId });
+    if (foundBook == null)
+    {
+      return NotFound("Book not found.");
+    }
+
+    var sql = $"DELETE FROM \"UserLibrary\" WHERE \"userId\" = {UserId} AND \"bookId\" = {BookId}";
+    await _db.ExecuteAsync(sql);
+
+    return Ok($"Deleted book {foundBook.title} from user {foundUser.username}'s library.");
+  }
 }

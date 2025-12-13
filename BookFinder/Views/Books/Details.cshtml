@@ -1,3 +1,9 @@
+{
+  @Layout = "Navbar";     @* The navbar of the site. For details go to Views/Shared/Navbar.cshmtl *@
+}
+
+@* here is the detail page of the book. There should be everything about books. Also review and reviews comment section. User can commit review and comment. also delete  *@
+
 <h1>@ViewBag.Book.Title</h1>
 <h3>by @ViewBag.Book.Author</h3>
 
@@ -8,3 +14,4 @@
   var review = ViewBag.Reviews[i];
   var comments = review.Comments;
 }
+
