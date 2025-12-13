@@ -15,6 +15,16 @@ public class AuthController(IDbConnection db) : Controller
     return View();
   }
 
+  public IActionResult Login()
+  {
+    return View();
+  }
+
+  public IActionResult Register()
+  {
+    return View();
+  }
+
   [HttpPost("auth/login")]
   public async Task<IActionResult> Login([FromBody] LoginDto model)
   {

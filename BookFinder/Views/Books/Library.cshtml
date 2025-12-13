@@ -1,0 +1,16 @@
+<h1>Library Page</h1>
+
+@foreach (var item in ViewBag.Library)
+{
+  <div>
+    <hr>
+    <div>BookId: @item.BookId</div>
+    <div>Title: @item.Title</div>
+    <div>imageURL: @item.imageURL</div>
+    <div>Progress: @item.Progress</div>
+    <div>Score: @item.Score</div>
+    <div>Condition: @item.Condition</div>
+    <div>UpdateDate: @item.UpdateDate</div>
+    <hr>
+  </div>
+}
