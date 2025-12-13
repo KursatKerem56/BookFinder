@@ -1,3 +1,9 @@
+{
+  @Layout = "Navbar";     @* The navbar of the site. For details go to Views/Shared/Navbar.cshmtl *@
+}
+
+@* This is the publisher page.  ("ID" INTEGER, "Title" TEXT, "Author" CHARACTER VARYING, "Publisher" CHARACTER VARYING, "Publication Date" date, "Page Count" INTEGER)  they are the values *@
+
 <h1>@ViewBag.Publisher.name</h1>
 
 <div>Published Books Count: @((ViewBag.PublishedBooks as IEnumerable<dynamic>)?.Count() ?? 0)</div>
