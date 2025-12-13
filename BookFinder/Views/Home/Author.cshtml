@@ -1,9 +1,105 @@
-{
-  @Layout = "Navbar";     @* The navbar of the site. For details go to Views/Shared/Navbar.cshmtl *@
+@{
+  Layout = "Navbar";
+  ViewData["Title"] = "Author";
 }
 
-@* Authors Page. ("ID" INTEGER, "Title" TEXT, "Author" CHARACTER VARYING, "Publisher" CHARACTER VARYING, "Publication Date" date, "Page Count" They are the values *@
+@{
+  var author = ViewBag.Author;
+  var books = ViewBag.WrittenBooks as IEnumerable<dynamic>;
+}
 
-<h1>@ViewBag.Author.name</h1>
+<style>
+  .page-title {
+    font-size: 36px;
+    font-weight: 900;
+    color: #f97316;
+    margin-bottom: 10px;
+  }
 
-<div>Written Books Count: @((ViewBag.WrittenBooks as IEnumerable<dynamic>)?.Count() ?? 0)</div>
+  .subtitle {
+    color: #9ca3af;
+    margin-bottom: 40px;
+    font-size: 16px;
+  }
+
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+  }
+
+  .book-card {
+    background: #020617;
+    border-radius: 20px;
+    padding: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+    transition: transform .25s ease, border-color .25s ease;
+  }
+
+  .book-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(249, 115, 22, .45);
+  }
+
+  .book-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .book-title a {
+    color: #f9fafb;
+    text-decoration: none;
+  }
+
+  .book-title a:hover {
+    color: #fdba74;
+  }
+
+  .meta {
+    font-size: 14px;
+    color: #9ca3af;
+  }
+
+  .score {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fbbf24;
+  }
+</style>
+
+<h1 class="page-title">@author.name</h1>
+<p class="subtitle">
+  Books written: @(books?.Count() ?? 0)
+</p>
+
+@if (books != null && books.Any())
+{
+  <div class="books-grid">
+    @foreach (var book in books)
+    {
+      <div class="book-card">
+        <div class="book-title">
+          <a href="/Books/Details/@book.bookId">
+            @book.title
+          </a>
+        </div>
+
+        <div class="meta">
+          Publisher:
+          <a href="/publisher/@book.publisherId">@book.publisher</a>
+        </div>
+
+        <div class="score">
+          ⭐ Score: 0 <span style="color:#9ca3af">(No reviews yet)</span>
+        </div>
+      </div>
+    }
+  </div>
+}
+else
+{
+  <p class="subtitle">This author has no books listed.</p>
+}

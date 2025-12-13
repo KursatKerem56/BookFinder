@@ -1,22 +1,206 @@
-{
-  @Layout = "Navbar";     @* The navbar of the site. For details go to Views/Shared/Navbar.cshmtl *@
+@using System.Security.Claims
+@{
+  Layout = "Navbar";
+  ViewData["Title"] = "My Library";
+
+  var library = ViewBag.Library as IEnumerable<dynamic>;
+  var userId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 
-@* This is users library. User show their books on this page. User can add, delete, update operation on a book in the list. *@
+<style>
+  .page-title {
+    font-size: 34px;
+    font-weight: 900;
+    color: #f97316;
+    margin-bottom: 30px;
+  }
 
-<h1>Library Page</h1>
+  .library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+  }
 
-@foreach (var item in ViewBag.Library)
+  .library-card {
+    background: #020617;
+    border-radius: 22px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 14px 46px rgba(0, 0, 0, 0.55);
+  }
+
+  .library-card h3 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .meta {
+    font-size: 14px;
+    color: #9ca3af;
+    margin-bottom: 14px;
+  }
+
+  .field {
+    margin-bottom: 12px;
+  }
+
+  label {
+    font-size: 13px;
+    color: #9ca3af;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    background: #020617;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+  }
+
+  .status-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .status-group label {
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .btn.update {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: white;
+  }
+
+  .btn.delete {
+    background: transparent;
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+  }
+
+  .empty {
+    color: #9ca3af;
+    font-style: italic;
+  }
+</style>
+
+<h1 class="page-title">📚 My Library</h1>
+
+@if (library != null && library.Any())
 {
-  <div>
-    <hr>
-    <div>BookId: @item.BookId</div>
-    <div>Title: @item.Title</div>
-    <div>imageURL: @item.imageURL</div>
-    <div>Progress: @item.Progress</div>
-    <div>Score: @item.Score</div>    @* Warning: Score should be between 1 and 10  *@
-    <div>Condition: @item.Condition</div>   @* Warning: this is not a string type element. This is a int. 1 = reading, 2 = Completed, 3 = Plan to Read,  4 = Dropped,  5 = On Hold. Put a radio button thing, let user select 5 of them and get the int type element from it. *@
-    <div>UpdateDate: @item.UpdateDate</div>
-    <hr>
+  <div class="library-grid">
+    @foreach (var item in library)
+    {
+      <div class="library-card">
+        <h3>@item.Title</h3>
+
+        <div class="meta">
+          Last updated: @item.UpdateDate
+        </div>
+
+        <div class="field">
+          <label>Progress (pages)</label>
+          <input type="number" id="progress-@item.BookId" value="@item.Progress" min="0" />
+        </div>
+
+        <div class="field">
+          <label>Score (1–10)</label>
+          <input type="number" id="score-@item.BookId" value="@item.Score" min="1" max="10" />
+        </div>
+
+        <div class="field">
+          <label>Status</label>
+          <div class="status-group">
+            @{
+              var status = (int)item.Condition;
+            }
+            <label><input type="radio" name="status-@item.BookId" value="1" @(status == 1 ? "checked" : "") />
+              Reading</label>
+            <label><input type="radio" name="status-@item.BookId" value="2" @(status == 2 ? "checked" : "") />
+              Completed</label>
+            <label><input type="radio" name="status-@item.BookId" value="3" @(status == 3 ? "checked" : "") /> Plan to
+              Read</label>
+            <label><input type="radio" name="status-@item.BookId" value="4" @(status == 4 ? "checked" : "") />
+              Dropped</label>
+            <label><input type="radio" name="status-@item.BookId" value="5" @(status == 5 ? "checked" : "") /> On
+              Hold</label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn update" onclick="updateLibrary(@item.BookId)">
+            Update
+          </button>
+
+          <button class="btn delete" onclick="deleteFromLibrary(@item.BookId)">
+            Delete
+          </button>
+        </div>
+      </div>
+    }
   </div>
 }
+else
+{
+  <p class="empty">Your library is empty.</p>
+}
+
+<script>
+  const userId = '@userId';
+
+  async function updateLibrary(bookId) {
+    const progress = document.getElementById(`progress-${bookId}`).value;
+    const score = document.getElementById(`score-${bookId}`).value;
+    const status = document.querySelector(`input[name="status-${bookId}"]:checked`).value;
+
+    await fetch('/books/library/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: userId,
+        bookId: bookId,
+        progress: progress,
+        score: score,
+        condition: status
+      })
+    });
+
+    location.reload();
+  }
+
+  async function deleteFromLibrary(bookId) {
+    if (!confirm('Remove this book from your library?')) return;
+
+    await fetch('/books/library/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: userId,
+        bookId: bookId
+      })
+    });
+
+    location.reload();
+  }
+</script>

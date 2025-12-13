@@ -1,0 +1,201 @@
+@{
+    Layout = "Navbar";
+    ViewData["Title"] = "BookFinder";
+}
+
+@{
+    var topTen = ViewBag.TopTenBooks as IEnumerable<dynamic>;
+    var books = ViewBag.Books as IEnumerable<dynamic>;
+}
+
+<style>
+    .hero {
+        padding: 60px 20px;
+        text-align: center;
+        background: radial-gradient(circle at top, #ffedd5, transparent 55%);
+        border-radius: 28px;
+        margin-bottom: 60px;
+    }
+
+    .hero h1 {
+        font-size: 42px;
+        font-weight: 900;
+        margin-bottom: 14px;
+        color: #f97316;
+    }
+
+    .hero p {
+        max-width: 640px;
+        margin: auto;
+        font-size: 18px;
+        color: #9ca3af;
+    }
+
+    .section-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin-bottom: 24px;
+        color: #f97316;
+    }
+
+    /* TOP TEN */
+    .top-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 22px;
+        margin-bottom: 80px;
+    }
+
+    .top-card {
+        background: #020617;
+        border-radius: 20px;
+        padding: 22px;
+        border: 1px solid rgba(249, 115, 22, 0.3);
+        box-shadow: 0 14px 50px rgba(0, 0, 0, 0.55);
+        transition: transform 0.25s ease;
+    }
+
+    .top-card:hover {
+        transform: translateY(-6px);
+    }
+
+    .rank {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fdba74;
+        margin-bottom: 6px;
+    }
+
+    .book-title {
+        font-size: 18px;
+        font-weight: 800;
+        margin-bottom: 6px;
+    }
+
+    .book-meta {
+        font-size: 14px;
+        color: #9ca3af;
+        margin-bottom: 12px;
+    }
+
+    .score {
+        font-size: 14px;
+        font-weight: 700;
+        color: #fbbf24;
+    }
+
+    /* ALL BOOKS */
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .book-card {
+        background: #020617;
+        border-radius: 18px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(249, 115, 22, 0.45);
+    }
+
+    .book-card a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .no-data {
+        color: #9ca3af;
+        font-style: italic;
+    }
+</style>
+
+<!-- HERO -->
+<section class="hero">
+    <h1>BookFinder</h1>
+    <p>
+        Discover top books, explore authors and publishers,
+        and build your own personal library.
+    </p>
+</section>
+
+<!-- TOP TEN BOOKS -->
+<section>
+    <h2 class="section-title">🔥 Top 10 Books</h2>
+
+    @if (topTen != null && topTen.Any())
+    {
+        var rank = 1;
+        <div class="top-grid">
+            @foreach (var book in topTen)
+            {
+                <div class="top-card">
+                    <div class="rank">#@rank</div>
+
+                    <div class="book-title">
+                        <a href="/Books/Details/@book.bookId">
+                            @book.title
+                        </a>
+                    </div>
+
+                    <div class="book-meta">
+                        Author:
+                        <a href="/author/@book.authorId">@book.author</a>
+                        <br />
+                        Publisher:
+                        <a href="/publisher/@book.publisherId">@book.publisher</a>
+                    </div>
+
+                    <div class="score">
+                        ⭐ Score: 0 <span style="color:#9ca3af">(No reviews yet)</span>
+                    </div>
+                </div>
+
+                rank++;
+            }
+        </div>
+    }
+    else
+    {
+        <p class="no-data">Top 10 list is empty.</p>
+    }
+</section>
+
+<!-- ALL BOOKS -->
+<section>
+    <h2 class="section-title">📚 Discover Books</h2>
+
+    @if (books != null && books.Any())
+    {
+        <div class="books-grid">
+            @foreach (var book in books)
+            {
+                <div class="book-card">
+                    <a href="/Books/Details/@book.bookId">
+                        <div class="book-title">@book.title</div>
+                    </a>
+
+                    <div class="book-meta">
+                        Author:
+                        <a href="/author/@book.authorId">@book.author</a><br />
+                        Publisher:
+                        <a href="/publisher/@book.publisherId">@book.publisher</a>
+                    </div>
+
+                    <div class="score">
+                        ⭐ Score: 0
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="no-data">No books found.</p>
+    }
+</section>

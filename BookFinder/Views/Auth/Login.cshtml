@@ -1,3 +1,183 @@
-<h1>login page</h1>
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
 
-@* this is login page. user should login from here *@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - BookFinder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at top, #fed7aa, #ffedd5, #fecaca);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: #fffaf5;
+            padding: 36px;
+            border-radius: 26px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .25);
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            color: #f97316;
+            font-size: 30px;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        p {
+            text-align: center;
+            color: #6b7280;
+            margin-bottom: 28px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2933;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #e5e7eb;
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, .3);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        .message {
+            margin-top: 14px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .error {
+            color: #b91c1c;
+        }
+
+        .success {
+            color: #15803d;
+        }
+
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .footer a {
+            color: #f97316;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <h1>Login</h1>
+        <p>Welcome back to BookFinder</p>
+
+        <form id="loginForm">
+            <label>Username</label>
+            <input id="username" type="text" required />
+
+            <label>Password</label>
+            <input id="password" type="password" required />
+
+            <button type="submit">Login</button>
+            <div id="message" class="message"></div>
+        </form>
+
+        <div class="footer">
+            Don’t have an account?
+            <a href="/auth/register">Sign up</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const msg = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msg.textContent = '';
+            msg.className = 'message';
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                msg.textContent = 'Please fill in all fields.';
+                msg.classList.add('error');
+                return;
+            }
+
+            try {
+                const res = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const text = await res.text();
+
+                if (res.ok) {
+                    msg.textContent = 'Login successful. Redirecting...';
+                    msg.classList.add('success');
+
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 700);
+                } else {
+                    msg.textContent = text || 'Login failed.';
+                    msg.classList.add('error');
+                }
+            } catch {
+                msg.textContent = 'Network error.';
+                msg.classList.add('error');
+            }
+        });
+    </script>
+
+</body>
+
+</html>
