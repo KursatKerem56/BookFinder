@@ -1,11 +1,888 @@
-<h3>Top Ten Books</h3>
-@foreach (var item in ViewBag.TopTenBooks)
-{
-  <p>@item.Title</p>
+@{
+  ViewData["Title"] = "Home";
+
+  var top = ViewBag.TopTenBooks as IEnumerable<dynamic>;
+  var all = ViewBag.Books as IEnumerable<dynamic>;
+
+  // Optional: If you set this in HomeController, it will be used directly:
+  // ViewBag.BookScores = Dictionary<int, decimal> (BookId -> AvgScore)
+  var scoreDict = ViewBag.BookScores as IDictionary<int, object>;
 }
 
-<h3>All Books</h3>
-@foreach (var item in ViewBag.Books)
-{
-  <p>@item.title</p>
-}
+<style>
+  :root {
+    --bg: #0f0f12;
+    --card: rgba(255, 255, 255, .06);
+    --stroke: rgba(255, 255, 255, .12);
+
+    --orange1: #ff7a18;
+    --orange2: #ff9a3c;
+    --orange3: #ffb870;
+
+    --text: #f5f5f7;
+    --muted: rgba(245, 245, 247, .75);
+    --muted2: rgba(245, 245, 247, .55);
+
+    --shadow: 0 12px 30px rgba(0, 0, 0, .35);
+    --radius: 18px;
+  }
+
+  body {
+    background: radial-gradient(1200px 500px at 15% 0%, rgba(255, 122, 24, .20), transparent 60%),
+      radial-gradient(900px 400px at 85% 10%, rgba(255, 154, 60, .16), transparent 60%),
+      linear-gradient(180deg, #0b0b0d 0%, #111116 100%);
+    color: var(--text);
+  }
+
+  .page-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 22px 18px 60px;
+  }
+
+  /* Top bar */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--orange1), var(--orange2));
+    box-shadow: 0 10px 24px rgba(255, 122, 24, .25);
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .18);
+    flex: 0 0 auto;
+  }
+
+  .brand-title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .brand-title b {
+    font-size: 16px;
+    letter-spacing: .2px;
+  }
+
+  .brand-title span {
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+
+  .auth-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    border: 1px solid var(--stroke);
+    background: rgba(255, 255, 255, .05);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 154, 60, .55);
+    background: rgba(255, 154, 60, .10);
+  }
+
+  .btn.primary {
+    border-color: rgba(255, 154, 60, .55);
+    background: linear-gradient(135deg, rgba(255, 122, 24, .18), rgba(255, 154, 60, .10));
+  }
+
+  /* Hero */
+  .hero {
+    border: 1px solid var(--stroke);
+    background:
+      radial-gradient(900px 380px at 20% 30%, rgba(255, 122, 24, .20), transparent 55%),
+      radial-gradient(800px 320px at 80% 0%, rgba(255, 184, 112, .16), transparent 60%),
+      linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
+    box-shadow: var(--shadow);
+    border-radius: calc(var(--radius) + 6px);
+    padding: 20px 20px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.15;
+  }
+
+  .hero p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    max-width: 70ch;
+  }
+
+  .badge {
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 154, 60, .45);
+    color: rgba(255, 210, 170, .95);
+    background: rgba(255, 122, 24, .12);
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    user-select: none;
+  }
+
+  .hero-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .hero-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  /* Layout grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1.2fr .8fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  @@media (max-width: 920px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .panel {
+    border: 1px solid var(--stroke);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-head {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, .10);
+    background: rgba(0, 0, 0, .15);
+  }
+
+  .panel-head h2 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: .2px;
+  }
+
+  /* Top Ten cards */
+  .top-grid {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @@media (max-width: 520px) {
+    .top-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .book-card {
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .03));
+    border-radius: 16px;
+    padding: 14px 14px 12px;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    overflow: hidden;
+    min-height: 86px;
+  }
+
+  .book-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 154, 60, .55);
+    background: linear-gradient(180deg, rgba(255, 154, 60, .12), rgba(255, 255, 255, .03));
+  }
+
+  .rank {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 11px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 154, 60, .40);
+    background: rgba(255, 122, 24, .10);
+    color: rgba(255, 220, 190, .95);
+  }
+
+  .title {
+    margin: 2px 0 0;
+    font-weight: 750;
+    letter-spacing: .2px;
+    font-size: 14px;
+  }
+
+  .sub {
+    margin: 7px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    color: var(--muted2);
+    font-size: 12px;
+  }
+
+  /* Rating */
+  .rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(0, 0, 0, .20);
+    color: var(--muted);
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .stars {
+    letter-spacing: 1px;
+    color: rgba(255, 184, 112, .95);
+  }
+
+  .score-text {
+    color: rgba(245, 245, 247, .85);
+    font-weight: 650;
+  }
+
+  /* All books list + search */
+  .all-wrap {
+    padding: 16px;
+  }
+
+  .searchbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(0, 0, 0, .22);
+    margin-bottom: 12px;
+  }
+
+  .searchbar input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+  }
+
+  .searchbar input::placeholder {
+    color: rgba(245, 245, 247, .45);
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 420px;
+    overflow: auto;
+    padding-right: 4px;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, .10);
+    background: rgba(255, 255, 255, .04);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+
+  .row:hover {
+    border-color: rgba(255, 154, 60, .50);
+    transform: translateY(-1px);
+  }
+
+  .row .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange1), var(--orange3));
+    box-shadow: 0 8px 18px rgba(255, 122, 24, .25);
+    flex: 0 0 auto;
+  }
+
+  .row .name {
+    font-weight: 650;
+    font-size: 13.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 520px;
+  }
+
+  @@media (max-width: 520px) {
+    .row .name {
+      max-width: 280px;
+    }
+  }
+
+  .chip {
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: rgba(255, 220, 190, .95);
+    border: 1px solid rgba(255, 154, 60, .40);
+    background: rgba(255, 122, 24, .10);
+    flex: 0 0 auto;
+    user-select: none;
+  }
+
+  .empty {
+    padding: 18px 12px;
+    color: var(--muted);
+    text-align: center;
+    border-radius: 14px;
+    border: 1px dashed rgba(255, 255, 255, .16);
+    background: rgba(255, 255, 255, .03);
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 9999;
+  }
+
+  .modal {
+    width: min(520px, 100%);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .03));
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .50);
+    overflow: hidden;
+  }
+
+  .modal-head {
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, .10);
+    background: rgba(0, 0, 0, .20);
+  }
+
+  .modal-head b {
+    font-size: 14px;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .field label {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .field input {
+    padding: 11px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    background: rgba(0, 0, 0, .20);
+    color: var(--text);
+    outline: none;
+  }
+
+  .field input:focus {
+    border-color: rgba(255, 154, 60, .55);
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: var(--muted2);
+    margin-top: 6px;
+  }
+
+  .toast {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 154, 60, .40);
+    background: rgba(255, 122, 24, .10);
+    color: rgba(255, 230, 210, .95);
+    display: none;
+    white-space: pre-wrap;
+    font-size: 12.5px;
+  }
+</style>
+
+<div class="page-wrap">
+  <!-- TOP BAR + AUTH -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M6 4h11a2 2 0 0 1 2 2v13a1 1 0 0 1-1.447.894L12 17.118l-5.553 2.776A1 1 0 0 1 5 19V5a1 1 0 0 1 1-1Z"
+            stroke="white" stroke-width="1.6" />
+          <path d="M8 8h8M8 11h8" stroke="white" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+      </div>
+      <div class="brand-title">
+        <b>BookFinder</b>
+        <span>Discover top picks and browse the full library.</span>
+      </div>
+    </div>
+
+    <div class="auth-actions">
+      <button class="btn" type="button" onclick="openModal('login')">🔐 Login</button>
+      <button class="btn primary" type="button" onclick="openModal('signup')">✨ Sign up</button>
+      <button class="btn" type="button" onclick="doLogout()">↩️ Logout</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-row">
+      <div>
+        <h1>Your next favorite book, in seconds.</h1>
+        <p>Check the Top 10 list, explore all books, and see community scores from reviews.</p>
+      </div>
+      <div class="hero-right">
+        <span class="badge">📚 @(all?.Count() ?? 0) books</span>
+        <span class="badge">🧡 Orange theme</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <!-- TOP TEN -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Top 10 Books</h2>
+        <span class="badge">Featured</span>
+      </div>
+
+      <div class="top-grid">
+        @if (top != null && top.Any())
+        {
+          var i = 1;
+          foreach (var item in top)
+          {
+            // Try to read BookId if present
+            int? bookId = null;
+            try { bookId = (int?)item.BookId; } catch { /* ignore */ }
+
+            <div class="book-card" data-bookid="@(bookId?.ToString() ?? "")">
+              <span class="rank">#@i</span>
+              <div class="title">@item.Title</div>
+
+              <div class="sub">
+                <span>Community score</span>
+                <span class="rating js-rating">
+                  <span class="stars js-stars">★★★★★</span>
+                  <span class="score-text js-score">—</span>
+                </span>
+              </div>
+            </div>
+            i++;
+          }
+        }
+        else
+        {
+          <div class="empty" style="grid-column: 1 / -1;">
+            No Top 10 books found.
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ALL BOOKS -->
+    <section class="panel">
+      <div class="panel-head">
+        <h2>All Books</h2>
+        <span class="badge">Library</span>
+      </div>
+
+      <div class="all-wrap">
+        <div class="searchbar">
+          <span aria-hidden="true">🔎</span>
+          <input id="bookSearch" type="text" placeholder="Search by title..." />
+        </div>
+
+        <div id="bookList" class="list">
+          @if (all != null && all.Any())
+          {
+            foreach (var b in all)
+            {
+              // Support both "Title" and "title" from your dynamic objects
+              var title = (b.title ?? b.Title)?.ToString() ?? "Untitled";
+
+              int bookId = 0;
+              try { bookId = (int)(b.bookid ?? b.BookId ?? b.id ?? b.Id); } catch { bookId = 0; }
+
+              // If your query already includes a score field, this will pick it up
+              decimal? score = null;
+              try
+              {
+                var s = (b.score ?? b.Score ?? b.averagescore ?? b.AverageScore);
+                if (s != null) score = Convert.ToDecimal(s);
+              }
+              catch { /* ignore */ }
+
+              // Or if you provide ViewBag.BookScores[bookId]
+              if (score == null && scoreDict != null && bookId != 0 && scoreDict.ContainsKey(bookId))
+              {
+                try { score = Convert.ToDecimal(scoreDict[bookId]); } catch { }
+              }
+
+              <div class="row" data-bookid="@bookId" data-title="@title.ToLowerInvariant()">
+                <div class="left">
+                  <span class="dot" aria-hidden="true"></span>
+                  <div class="name">@title</div>
+                </div>
+
+                <div style="display:flex; gap:10px; align-items:center;">
+                  <span class="rating js-rating">
+                    <span class="stars js-stars">★★★★★</span>
+                    <span class="score-text js-score">@((score.HasValue) ? score.Value.ToString("0.0") : "—")</span>
+                  </span>
+                  <span class="chip">Book</span>
+                </div>
+              </div>
+            }
+          }
+          else
+          {
+            <div class="empty">No books found.</div>
+          }
+        </div>
+
+        <div class="hint">Tip: scores are filled from your review data (average rating).</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div id="modal-login" class="modal-backdrop" onclick="backdropClose(event, 'login')">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <b>Login</b>
+      <button class="btn" type="button" onclick="closeModal('login')">✖</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Username</label>
+        <input id="login-username" type="text" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="login-password" type="password" autocomplete="current-password" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" type="button" onclick="closeModal('login')">Cancel</button>
+        <button class="btn primary" type="button" onclick="doLogin()">Login</button>
+      </div>
+
+      <div id="toast-login" class="toast"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SIGNUP MODAL -->
+<div id="modal-signup" class="modal-backdrop" onclick="backdropClose(event, 'signup')">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <b>Sign up</b>
+      <button class="btn" type="button" onclick="closeModal('signup')">✖</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Username</label>
+        <input id="signup-username" type="text" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="signup-password" type="password" autocomplete="new-password" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" type="button" onclick="closeModal('signup')">Cancel</button>
+        <button class="btn primary" type="button" onclick="doSignup()">Create account</button>
+      </div>
+
+      <div class="hint">Your API rejects usernames with spaces (per your AuthController).</div>
+      <div id="toast-signup" class="toast"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ====== SEARCH ======
+  (function () {
+    const input = document.getElementById("bookSearch");
+    const list = document.getElementById("bookList");
+    if (!input || !list) return;
+
+    const rows = Array.from(list.querySelectorAll(".row"));
+
+    input.addEventListener("input", function () {
+      const q = (input.value || "").trim().toLowerCase();
+      let visible = 0;
+
+      rows.forEach(r => {
+        const t = r.getAttribute("data-title") || "";
+        const show = !q || t.includes(q);
+        r.style.display = show ? "" : "none";
+        if (show) visible++;
+      });
+
+      const emptyId = "emptyState";
+      let empty = list.querySelector("#" + emptyId);
+
+      if (visible === 0 && rows.length > 0) {
+        if (!empty) {
+          empty = document.createElement("div");
+          empty.id = emptyId;
+          empty.className = "empty";
+          empty.textContent = "No results match your search.";
+          list.prepend(empty);
+        }
+      } else if (empty) {
+        empty.remove();
+      }
+    });
+  })();
+
+  // ====== MODAL HELPERS ======
+  function openModal(kind) {
+    const el = document.getElementById("modal-" + kind);
+    if (!el) return;
+    el.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal(kind) {
+    const el = document.getElementById("modal-" + kind);
+    if (!el) return;
+    el.style.display = "none";
+    document.body.style.overflow = "";
+  }
+  function backdropClose(evt, kind) {
+    if (evt.target && evt.target.id === "modal-" + kind) closeModal(kind);
+  }
+  function showToast(id, msg) {
+    const t = document.getElementById(id);
+    if (!t) return;
+    t.style.display = "block";
+    t.textContent = msg;
+  }
+  function clearToast(id) {
+    const t = document.getElementById(id);
+    if (!t) return;
+    t.style.display = "none";
+    t.textContent = "";
+  }
+
+  // ====== AUTH (adjust URLs if your routes differ) ======
+  async function doSignup() {
+    clearToast("toast-signup");
+    const username = (document.getElementById("signup-username").value || "").trim();
+    const password = (document.getElementById("signup-password").value || "").trim();
+
+    if (!username || !password) {
+      showToast("toast-signup", "Please enter username and password.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include"
+      });
+
+      const text = await res.text();
+      if (!res.ok) {
+        showToast("toast-signup", text || "Sign up failed.");
+        return;
+      }
+
+      showToast("toast-signup", text || "User registered.");
+      // Optionally auto-close:
+      // closeModal("signup");
+    } catch (e) {
+      showToast("toast-signup", "Network error: " + e);
+    }
+  }
+
+  async function doLogin() {
+    clearToast("toast-login");
+    const username = (document.getElementById("login-username").value || "").trim();
+    const password = (document.getElementById("login-password").value || "").trim();
+
+    if (!username || !password) {
+      showToast("toast-login", "Please enter username and password.");
+      return;
+    }
+
+    // If your login route is different, change "/auth/login"
+    try {
+      const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+        credentials: "include"
+      });
+
+      const text = await res.text();
+      if (!res.ok) {
+        showToast("toast-login", text || "Login failed.");
+        return;
+      }
+
+      showToast("toast-login", text || "Logged in.");
+      // If you want the page to reflect auth state:
+      // location.reload();
+    } catch (e) {
+      showToast("toast-login", "Network error: " + e);
+    }
+  }
+
+  async function doLogout() {
+    // If your logout route is different, change it here
+    try {
+      const res = await fetch("/auth/logout", { method: "POST", credentials: "include" });
+      // some setups use GET; if so:
+      // const res = await fetch("/auth/logout", { method:"GET", credentials:"include" });
+
+      if (res.ok) location.reload();
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  // ====== SCORES FROM REVIEW CONTROLLER ======
+  // Option A: If your server already rendered scores, nothing else is needed.
+  // Option B: Fetch them once and fill UI.
+  (async function hydrateScores() {
+    // Change this endpoint to whatever your ReviewController exposes:
+    // Expected JSON example:
+    // [{ "bookId": 1, "avgScore": 4.2 }, { "bookId": 2, "avgScore": 3.7 }]
+    const endpoint = "/review/scores";
+
+    try {
+      const res = await fetch(endpoint, { credentials: "include" });
+      if (!res.ok) return;
+
+      const data = await res.json();
+      if (!Array.isArray(data)) return;
+
+      const map = new Map();
+      data.forEach(x => {
+        const id = Number(x.bookId ?? x.BookId);
+        const s = Number(x.avgScore ?? x.AvgScore ?? x.score ?? x.Score);
+        if (Number.isFinite(id) && Number.isFinite(s)) map.set(String(id), s);
+      });
+
+      document.querySelectorAll("[data-bookid]").forEach(el => {
+        const id = el.getAttribute("data-bookid");
+        if (!id || !map.has(id)) return;
+
+        const score = map.get(id);
+        const scoreEl = el.querySelector(".js-score");
+        const starsEl = el.querySelector(".js-stars");
+
+        if (scoreEl) scoreEl.textContent = score.toFixed(1);
+        if (starsEl) starsEl.textContent = renderStars(score);
+      });
+    } catch (e) {
+      // silent fail
+    }
+  })();
+
+  function renderStars(score) {
+    // score assumed 0..5
+    const s = Math.max(0, Math.min(5, score));
+    const full = Math.floor(s);
+    const half = (s - full) >= 0.5 ? 1 : 0;
+
+    // Using unicode: ★ full, ☆ empty, ⯪/½ is not consistent; keep simple:
+    // We'll show full stars, and the rest empty. (Half-star not used to avoid font issues.)
+    const stars = "★★★★★".slice(0, full) + "☆☆☆☆☆".slice(0, 5 - full);
+    return stars;
+  }
+</script>
