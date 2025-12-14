@@ -102,16 +102,14 @@
                   </td>
                   <td>
                     <i class="bi bi-calendar text-muted"></i>
-                    @((book.PublicationDate as DateTime?)?.ToString("MMM dd, yyyy") ?? "N/A")
+                    @((book.PublicationDate).ToString() ?? "N/A")
                   </td>
                   <td>
                     <i class="bi bi-file-text text-muted"></i>
                     @(book.PageCount ?? 0) pages
                   </td>
                   <td>
-                    <a asp-controller="Books"
-   asp-action="Details"
-   asp-route-id="@book.ID">
+                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.ID">
                       <i class="bi bi-eye"></i> View
                     </a>
                   </td>
@@ -129,7 +127,7 @@
       }
 
       <div class="mt-4">
-        <a  asp-controller="Home" asp-action="Index">
+        <a asp-controller="Home" asp-action="Index">
           <i class="bi bi-arrow-left"></i> Back to Home
         </a>
       </div>
