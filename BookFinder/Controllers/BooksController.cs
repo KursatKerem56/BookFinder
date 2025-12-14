@@ -304,7 +304,7 @@ public class BooksController(IDbConnection db) : Controller
     }
 
     // Update the library entry with new values and current timestamp
-    var sql = $"UPDATE \"UserLibrary\" SET \"progressPages\" = {Progress}, \"score\" = {Score}, \"statusid\" = {Condition}, \"updateDate\" = CURRENT_TIMESTAMP WHERE \"userId\" = {UserId} AND \"bookId\" = {BookId}";
+    var sql = $"UPDATE \"UserLibrary\" SET \"progressPages\" = {Progress}, \"score\" = {Score}, \"statusId\" = {Condition}, \"updatedAt\" = CURRENT_TIMESTAMP WHERE \"userId\" = {UserId} AND \"bookId\" = {BookId}";
     await _db.ExecuteAsync(sql);
 
     return Ok($"Updated library entry for book {foundBook.title} in user {foundUser.username}'s library.");
