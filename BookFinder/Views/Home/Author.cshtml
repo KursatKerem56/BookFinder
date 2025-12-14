@@ -3,7 +3,7 @@
   var author = ViewBag.Author;
   var writtenBooks = ViewBag.WrittenBooks as IEnumerable<dynamic>;
 }
-
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
 <html lang="en">
 
@@ -101,7 +101,9 @@
                     @(book.PageCount ?? 0) pages
                   </td>
                   <td>
-                    <a href="/books/details/@book.ID">
+                    <a asp-controller="Books"
+   asp-action="Details"
+   asp-route-id="@book.Id">
                       <i class="bi bi-eye"></i> View
                     </a>
                   </td>
@@ -119,7 +121,7 @@
       }
 
       <div class="mt-4">
-        <a href="/">
+        <a asp-controller="Home" asp-action="Index">
           <i class="bi bi-arrow-left"></i> Back to Home
         </a>
       </div>
@@ -131,7 +133,7 @@
       <div class="alert alert-danger">
         <i class="bi bi-exclamation-triangle"></i> Author not found.
       </div>
-      <a href="/">
+      <a asp-controller="Home" asp-action="Index">
         <i class="bi bi-house"></i> Go to Home
       </a>
     </div>

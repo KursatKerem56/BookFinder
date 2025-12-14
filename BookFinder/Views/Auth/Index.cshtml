@@ -1,6 +1,7 @@
 @{
     ViewData["Title"] = "Authentication";
 }
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,7 +31,7 @@
                                 <h3 class="card-title">Login</h3>
                                 <p class="card-text mb-4">Already have an account? Sign in to access your library and
                                     reviews.</p>
-                                <a href="/auth/login" class="btn btn-primary btn-lg mt-auto">
+                                <a asp-controller="Auth" asp-action="Login" class="btn btn-primary btn-lg mt-auto">
                                     <i class="bi bi-arrow-right-circle"></i> Go to Login
                                 </a>
                             </div>
@@ -43,7 +44,7 @@
                                 <h3 class="card-title">Register</h3>
                                 <p class="card-text mb-4">New here? Create an account to start building your book
                                     collection.</p>
-                                <a href="/auth/register" class="btn btn-success btn-lg mt-auto">
+                                <a asp-controller="Auth" asp-action="Register" class="btn btn-success btn-lg mt-auto">
                                     <i class="bi bi-arrow-right-circle"></i> Go to Register
                                 </a>
                             </div>

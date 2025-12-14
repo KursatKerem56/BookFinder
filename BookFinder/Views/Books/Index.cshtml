@@ -2,7 +2,7 @@
   ViewData["Title"] = "Books";
   var books = ViewBag.Books as IEnumerable<dynamic>;
 }
-
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
 <html lang="en">
 
@@ -133,9 +133,9 @@
                     </small>
                   </p>
                 }
-                <a href="/books/details/@book.bookId">
-                  <i class="bi bi-eye"></i> View Details
-                </a>
+                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.bookId">
+   <i class="bi bi-eye"></i> View Details
+</a>
               </div>
             </div>
           </div>

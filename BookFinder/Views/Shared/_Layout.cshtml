@@ -1,5 +1,5 @@
 @using System.Security.Claims
-
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <style>
     .navbar-custom {
         background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -59,7 +59,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand"  asp-controller="Home" asp-action="Index">
             <i class="bi bi-book-half"></i> BookFinder
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -68,12 +68,12 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">
+                    <a class="nav-link"  asp-controller="Home" asp-action="Index">
                         <i class="bi bi-house-door-fill"></i> Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/books">
+                    <a class="nav-link" asp-controller="Books" asp-action="Index"> 
                         <i class="bi bi-collection-fill"></i> Books
                     </a>
                 </li>
@@ -106,7 +106,7 @@
                 else
                 {
                     <li class="nav-item">
-                        <a class="nav-link auth-link" href="/auth">
+                        <a class="nav-link auth-link" asp-controller="Auth" asp-action="Index" >
                             <i class="bi bi-shield-lock-fill"></i> Auth
                         </a>
                     </li>

@@ -1,7 +1,7 @@
 @{
     ViewData["Title"] = "Register";
 }
-
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 <!DOCTYPE html>
 <html lang="en">
 
@@ -78,7 +78,7 @@
 
                     <div class="text-center">
                         <p class="text-muted mb-0">Already have an account?
-                            <a href="/auth/login" class="text-decoration-none">Login here</a>
+                            <a asp-controller="Auth" asp-action="Login" class="text-decoration-none">Login here</a>
                         </p>
                     </div>
                 </div>
