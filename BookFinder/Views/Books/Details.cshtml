@@ -53,6 +53,12 @@
       border-radius: 5px;
       margin-bottom: 10px;
     }
+
+    a:link {
+      color: whitesmoke;
+      background-color: transparent;
+      text-decoration: none;
+    }
   </style>
 </head>
 
@@ -68,13 +74,15 @@
           <div class="col-md-9">
             <h1 class="display-4 fw-bold mb-3">@book.Title</h1>
             <p class="lead mb-2">
-              
-              <i class="bi bi-person"></i> by <a asp-controller="Home" asp-action="Author" asp-route-id="@book.AuthorId"><strong>@book.Author</strong></a>
-              
+
+              <i class="bi bi-person"></i> by <a asp-controller="Home" asp-action="Author"
+                asp-route-id="@book.AuthorId"><strong>@book.Author</strong></a>
+
             </p>
             <p class="mb-2">
-             
-              <i class="bi bi-building"></i> Published by  <a asp-controller="Home" asp-action="Publisher" asp-route-id="@book.PublisherId"><strong>@book.Publisher</strong>
+
+              <i class="bi bi-building"></i> Published by <a asp-controller="Home" asp-action="Publisher"
+                asp-route-id="@book.PublisherId"><strong>@book.Publisher</strong>
               </a>
             </p>
             @if (!string.IsNullOrEmpty(book.Serie))
@@ -91,7 +99,7 @@
             }
             <p class="mb-2">
               <i class="bi bi-calendar"></i>
-              @((book.PublicationDate as DateTime?)?.ToString("MMMM dd, yyyy") ?? "Unknown")
+              @(book.PublicationDate.ToString() ?? "Unknown")
             </p>
             <p class="mb-0">
               <i class="bi bi-file-text"></i> @(book.PageCount ?? 0) pages
