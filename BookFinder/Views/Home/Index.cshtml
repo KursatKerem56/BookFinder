@@ -59,7 +59,7 @@
                 <i class="bi bi-book-half"></i> Welcome to BookFinder
             </h1>
             <p class="lead mb-4">Discover, track, and review your favorite books</p>
-            <a asp-controller="Books" asp-action="Index" class="btn btn-light btn-lg">
+            <a href="/books">
                 <i class="bi bi-search"></i> Explore Books
             </a>
         </div>
@@ -102,8 +102,7 @@
                                             </small>
                                         </p>
                                     }
-                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.ID"
-                                        class="btn btn-primary btn-sm w-100">
+                                    <a href="/books/details/@book.ID">
                                         <i class="bi bi-eye"></i> View Details
                                     </a>
                                 </div>
@@ -136,8 +135,7 @@
                                 </div>
                                 <div class="card-body">
                                     <h5 class="card-title text-truncate" title="@book.title">@book.title</h5>
-                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.bookId"
-                                        class="btn btn-outline-primary btn-sm w-100">
+                                    <a href="/books/details/@book.bookId">
                                         <i class="bi bi-eye"></i> View Details
                                     </a>
                                 </div>
@@ -146,7 +144,7 @@
                     }
                 </div>
                 <div class="text-center mt-4">
-                    <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-lg">
+                    <a href="/books">
                         <i class="bi bi-arrow-right-circle"></i> View All Books
                     </a>
                 </div>

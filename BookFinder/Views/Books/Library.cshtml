@@ -163,8 +163,7 @@
                 </div>
 
                 <div class="d-grid gap-2">
-                  <a asp-controller="Books" asp-action="Details" asp-route-id="@entry.BookId"
-                    class="btn btn-primary btn-sm">
+                  <a href="/books/details/@entry.BookId">
                     <i class="bi bi-eye"></i> View Details
                   </a>
                   <button class="btn btn-outline-primary btn-sm update-btn" data-book-id="@entry.BookId"
@@ -188,7 +187,7 @@
         <i class="bi bi-bookmark display-1 text-muted"></i>
         <h3 class="mt-3">Your library is empty</h3>
         <p class="text-muted">Start adding books to track your reading journey!</p>
-        <a asp-controller="Books" asp-action="Index" class="btn btn-primary btn-lg">
+        <a href="/books">
           <i class="bi bi-search"></i> Browse Books
         </a>
       </div>

@@ -111,7 +111,7 @@
                     @(book.PageCount ?? 0) pages
                   </td>
                   <td>
-                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.ID" class="btn btn-sm btn-primary">
+                    <a href="/books/details/@book.ID">
                       <i class="bi bi-eye"></i> View
                     </a>
                   </td>
@@ -129,7 +129,7 @@
       }
 
       <div class="mt-4">
-        <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+        <a href="/">
           <i class="bi bi-arrow-left"></i> Back to Home
         </a>
       </div>
@@ -141,7 +141,7 @@
       <div class="alert alert-danger">
         <i class="bi bi-exclamation-triangle"></i> Publisher not found.
       </div>
-      <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+      <a href="/">
         <i class="bi bi-house"></i> Go to Home
       </a>
     </div>
