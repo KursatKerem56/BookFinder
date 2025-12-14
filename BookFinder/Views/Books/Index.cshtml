@@ -1,114 +1,206 @@
 @{
-  Layout = "Navbar";
   ViewData["Title"] = "Books";
-}
-
-@{
   var books = ViewBag.Books as IEnumerable<dynamic>;
 }
 
-<style>
-  .page-title {
-    font-size: 34px;
-    font-weight: 900;
-    margin-bottom: 32px;
-    color: #f97316;
-  }
+<!DOCTYPE html>
+<html lang="en">
 
-  .books-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 24px;
-  }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@ViewData["Title"] - BookFinder</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    .page-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 0;
+      margin-bottom: 30px;
+    }
 
-  .book-item {
-    background: #020617;
-    border-radius: 20px;
-    padding: 22px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 12px 42px rgba(0, 0, 0, 0.55);
-    transition: transform 0.25s ease, border-color 0.25s ease;
-  }
+    .book-card {
+      transition: transform 0.3s, box-shadow 0.3s;
+      height: 100%;
+    }
 
-  .book-item:hover {
-    transform: translateY(-6px);
-    border-color: rgba(249, 115, 22, 0.45);
-  }
+    .book-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
 
-  .book-title {
-    font-size: 18px;
-    font-weight: 800;
-    margin-bottom: 8px;
-  }
+    .book-cover {
+      height: 350px;
+      object-fit: cover;
+      width: 100%;
+    }
 
-  .book-title a {
-    color: #f9fafb;
-    text-decoration: none;
-  }
+    .rating-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: gold;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
 
-  .book-title a:hover {
-    color: #fdba74;
-  }
+    .search-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
 
-  .book-meta {
-    font-size: 14px;
-    color: #9ca3af;
-    line-height: 1.6;
-    margin-bottom: 14px;
-  }
+<body>
+  @await Html.PartialAsync("~/Views/Shared/Navbar.cshtml")
 
-  .book-meta a {
-    color: #f97316;
-    text-decoration: none;
-    font-weight: 600;
-  }
+  <div class="page-header">
+    <div class="container">
+      <h1 class="display-4 fw-bold">
+        <i class="bi bi-collection"></i> Browse Books
+      </h1>
+      <p class="lead mb-0">Discover your next favorite read</p>
+    </div>
+  </div>
 
-  .book-meta a:hover {
-    text-decoration: underline;
-  }
+  <div class="container mb-5">
+    <div class="search-box">
+      <div class="row g-3">
+        <div class="col-md-8">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Search books by title...">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select id="sortSelect" class="form-select">
+            <option value="title">Sort by Title</option>
+            <option value="rating">Sort by Rating</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-  .book-score {
-    font-size: 14px;
-    font-weight: 700;
-    color: #fbbf24;
-  }
-
-  .no-data {
-    color: #9ca3af;
-    font-style: italic;
-  }
-</style>
-
-<h1 class="page-title">📚 All Books</h1>
-
-@if (books != null && books.Any())
-{
-  <div class="books-list">
-    @foreach (var book in books)
+    @if (books != null && books.Any())
     {
-      <div class="book-item">
-        <div class="book-title">
-          <a href="/Books/Details/@book.bookId">
-            @book.title
-          </a>
-        </div>
+      <div class="mb-3">
+        <p class="text-muted">
+          <i class="bi bi-info-circle"></i>
+          Showing <span id="bookCount">@books.Count()</span> books
+        </p>
+      </div>
 
-        <div class="book-meta">
-          Author:
-          <a href="/author/@book.authorId">@book.author</a>
-          <br />
-          Publisher:
-          <a href="/publisher/@book.publisherId">@book.publisher</a>
-        </div>
-
-        <div class="book-score">
-          ⭐ Score: 0 <span style="color:#9ca3af">(No reviews yet)</span>
-        </div>
+      <div class="row g-4" id="booksContainer">
+        @foreach (var book in books)
+        {
+          <div class="col-md-6 col-lg-3 book-item" data-title="@book.title?.ToString().ToLower()"
+            data-rating="@(book.averageScore ?? 0)">
+            <div class="card book-card">
+              <div class="position-relative">
+                <img src="@book.imageURL" class="card-img-top book-cover" alt="@book.title">
+                @if (book.averageScore != null)
+                {
+                  <span class="rating-badge">
+                    <i class="bi bi-star-fill"></i> @string.Format("{0:0.0}", book.averageScore)
+                  </span>
+                }
+              </div>
+              <div class="card-body">
+                <h5 class="card-title text-truncate" title="@book.title">
+                  @book.title
+                </h5>
+                @if (book.publicationDate != null)
+                {
+                  <p class="card-text text-muted mb-2">
+                    <small>
+                      <i class="bi bi-calendar"></i>
+                      @((book.publicationDate as DateTime?)?.ToString("yyyy") ?? "N/A")
+                    </small>
+                  </p>
+                }
+                @if (book.pageCount != null && book.pageCount > 0)
+                {
+                  <p class="card-text text-muted mb-2">
+                    <small>
+                      <i class="bi bi-file-text"></i>
+                      @book.pageCount pages
+                    </small>
+                  </p>
+                }
+                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.bookId"
+                  class="btn btn-primary btn-sm w-100">
+                  <i class="bi bi-eye"></i> View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+    else
+    {
+      <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle display-4 d-block mb-3"></i>
+        <h4>No books available</h4>
+        <p>Check back later for new additions to our collection.</p>
       </div>
     }
   </div>
-}
-else
-{
-  <p class="no-data">No books found.</p>
-}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const booksContainer = document.getElementById('booksContainer');
+    const bookCount = document.getElementById('bookCount');
+
+    function filterAndSortBooks() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const sortBy = sortSelect.value;
+      const bookItems = Array.from(document.querySelectorAll('.book-item'));
+
+      let visibleCount = 0;
+
+      // Filter
+      bookItems.forEach(item => {
+        const title = item.dataset.title;
+        if (title.includes(searchTerm)) {
+          item.style.display = '';
+          visibleCount++;
+        } else {
+          item.style.display = 'none';
+        }
+      });
+
+      // Sort visible items
+      const visibleItems = bookItems.filter(item => item.style.display !== 'none');
+      visibleItems.sort((a, b) => {
+        if (sortBy === 'title') {
+          return a.dataset.title.localeCompare(b.dataset.title);
+        } else {
+          return parseFloat(b.dataset.rating) - parseFloat(a.dataset.rating);
+        }
+      });
+
+      // Reorder
+      visibleItems.forEach(item => booksContainer.appendChild(item));
+
+      // Update count
+      bookCount.textContent = visibleCount;
+    }
+
+    searchInput.addEventListener('input', filterAndSortBooks);
+    sortSelect.addEventListener('change', filterAndSortBooks);
+  </script>
+</body>
+
+</html>

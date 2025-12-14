@@ -1,6 +1,5 @@
 @{
-    Layout = null;
-    ViewData["Title"] = "Sign Up";
+    ViewData["Title"] = "Register";
 }
 
 <!DOCTYPE html>
@@ -8,192 +7,192 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up - BookFinder</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"] - BookFinder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body {
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at top, #fed7aa, #ffedd5, #fecaca);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+        .register-container {
+            max-width: 450px;
+            margin: 80px auto;
         }
 
         .card {
-            width: 100%;
-            max-width: 440px;
-            background: #fffaf5;
-            padding: 36px;
-            border-radius: 26px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, .25);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            margin: 0 0 8px;
-            color: #f97316;
-            font-size: 30px;
-            font-weight: 900;
-            text-align: center;
-        }
-
-        p {
-            text-align: center;
-            color: #6b7280;
-            margin-bottom: 28px;
-        }
-
-        label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1f2933;
-            margin-bottom: 6px;
-            display: block;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 14px;
-            border-radius: 12px;
-            border: 1.5px solid #e5e7eb;
-            font-size: 15px;
-            margin-bottom: 16px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #f97316;
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, .3);
-        }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            border-radius: 999px;
-            border: none;
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 6px;
-        }
-
-        .message {
-            margin-top: 14px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .error {
-            color: #b91c1c;
-        }
-
-        .success {
-            color: #15803d;
-        }
-
-        .footer {
-            margin-top: 18px;
-            text-align: center;
-            font-size: 14px;
-            color: #6b7280;
-        }
-
-        .footer a {
-            color: #f97316;
-            font-weight: 600;
-            text-decoration: none;
+        .password-strength {
+            height: 5px;
+            margin-top: 5px;
+            border-radius: 3px;
+            transition: all 0.3s;
         }
     </style>
 </head>
 
-<body>
+<body class="bg-light">
+    @await Html.PartialAsync("~/Views/Shared/Navbar.cshtml")
 
-    <div class="card">
-        <h1>Create Account</h1>
-        <p>Join BookFinder and start tracking your reading</p>
+    <div class="container">
+        <div class="register-container">
+            <div class="card">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-person-plus display-3 text-success"></i>
+                        <h2 class="mt-3">Create Account</h2>
+                        <p class="text-muted">Join BookFinder today</p>
+                    </div>
 
-        <form id="registerForm">
-            <label>Username</label>
-            <input id="username" type="text" required />
+                    <div id="alertContainer"></div>
 
-            <label>Password</label>
-            <input id="password" type="password" required />
+                    <form id="registerForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="bi bi-person"></i> Username
+                            </label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="form-text">Username cannot contain spaces</div>
+                        </div>
 
-            <label>Confirm Password</label>
-            <input id="confirmPassword" type="password" required />
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock"></i> Password
+                            </label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="password-strength bg-secondary" id="passwordStrength"></div>
+                            <div class="form-text" id="passwordHelp">Password strength: <span id="strengthText">-</span>
+                            </div>
+                        </div>
 
-            <button type="submit">Sign Up</button>
-            <div id="message" class="message"></div>
-        </form>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">
+                                <i class="bi bi-lock-fill"></i> Confirm Password
+                            </label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                required>
+                        </div>
 
-        <div class="footer">
-            Already have an account?
-            <a href="/auth/login">Login</a>
+                        <button type="submit" class="btn btn-success w-100 py-2 mb-3">
+                            <i class="bi bi-person-check"></i> Create Account
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="text-muted mb-0">Already have an account?
+                            <a asp-controller="Auth" asp-action="Login" class="text-decoration-none">Login here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const form = document.getElementById('registerForm');
-        const msg = document.getElementById('message');
+        // Password strength indicator
+        const passwordInput = document.getElementById('password');
+        const strengthBar = document.getElementById('passwordStrength');
+        const strengthText = document.getElementById('strengthText');
 
-        form.addEventListener('submit', async (e) => {
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            let strength = 0;
+
+            if (password.length >= 6) strength++;
+            if (password.length >= 10) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+            const colors = ['bg-danger', 'bg-warning', 'bg-info', 'bg-success'];
+            const texts = ['Weak', 'Fair', 'Good', 'Strong'];
+            const widths = ['25%', '50%', '75%', '100%'];
+
+            const index = Math.min(strength - 1, 3);
+
+            if (strength > 0) {
+                strengthBar.className = 'password-strength ' + colors[index];
+                strengthBar.style.width = widths[index];
+                strengthText.textContent = texts[index];
+                strengthText.className = 'fw-bold ' + colors[index].replace('bg-', 'text-');
+            } else {
+                strengthBar.className = 'password-strength bg-secondary';
+                strengthBar.style.width = '0%';
+                strengthText.textContent = '-';
+                strengthText.className = '';
+            }
+        });
+
+        // Form submission
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            msg.textContent = '';
-            msg.className = 'message';
 
             const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-            const confirm = document.getElementById('confirmPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const alertContainer = document.getElementById('alertContainer');
 
-            if (!username || !password || !confirm) {
-                msg.textContent = 'Please fill in all fields.';
-                msg.classList.add('error');
-                return;
-            }
+            // Clear previous alerts
+            alertContainer.innerHTML = '';
 
+            // Validate username
             if (username.includes(' ')) {
-                msg.textContent = 'Username cannot contain spaces.';
-                msg.classList.add('error');
+                showAlert('Username cannot contain spaces', 'danger');
                 return;
             }
 
-            if (password !== confirm) {
-                msg.textContent = 'Passwords do not match.';
-                msg.classList.add('error');
+            // Validate password match
+            if (password !== confirmPassword) {
+                showAlert('Passwords do not match', 'danger');
+                return;
+            }
+
+            // Validate password length
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters long', 'danger');
                 return;
             }
 
             try {
-                const res = await fetch('/auth/register', {
+                const response = await fetch('/auth/register', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
                     body: JSON.stringify({ username, password })
                 });
 
-                const text = await res.text();
+                const data = await response.text();
 
-                if (res.ok) {
-                    msg.textContent = 'Registration successful. Redirecting to login...';
-                    msg.classList.add('success');
-
+                if (response.ok) {
+                    showAlert('Registration successful! Redirecting to login...', 'success');
                     setTimeout(() => {
                         window.location.href = '/auth/login';
-                    }, 900);
+                    }, 2000);
+                } else if (response.status === 409) {
+                    showAlert('Username already exists', 'warning');
+                } else if (response.status === 400) {
+                    showAlert(data || 'Invalid input', 'danger');
                 } else {
-                    msg.textContent = text || 'Registration failed.';
-                    msg.classList.add('error');
+                    showAlert('An error occurred. Please try again.', 'danger');
                 }
-            } catch {
-                msg.textContent = 'Network error.';
-                msg.classList.add('error');
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Network error. Please check your connection.', 'danger');
             }
         });
-    </script>
 
+        function showAlert(message, type) {
+            const alertContainer = document.getElementById('alertContainer');
+            alertContainer.innerHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    </script>
 </body>
 
 </html>

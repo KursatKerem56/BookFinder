@@ -1,157 +1,89 @@
 @using System.Security.Claims
-@{
-    var isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
-    var username = User?.FindFirst(ClaimTypes.Name)?.Value;
-}
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@ViewData["Title"] - BookFinder</title>
-
-    <style>
-        :root {
-            --orange-main: #f97316;
-            --orange-dark: #ea580c;
-            --bg-dark: #0f172a;
-            --bg-light: #111827;
-            --text-main: #f9fafb;
-            --text-muted: #9ca3af;
-        }
-
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #0b0f19;
-            color: var(--text-main);
-        }
-
-        /* NAVBAR */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 32px;
-            background: linear-gradient(135deg, #0f172a, #020617);
-            border-bottom: 1px solid rgba(249, 115, 22, 0.35);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
-        }
-
-        .nav-left a {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: 0.4px;
-            color: var(--orange-main);
-            text-decoration: none;
-        }
-
-        .nav-left a:hover {
-            color: #fdba74;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .username {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .nav-btn {
-            padding: 8px 16px;
-            border-radius: 999px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.25s ease;
-        }
-
-        .login-btn {
-            background: linear-gradient(135deg, var(--orange-main), var(--orange-dark));
-            color: white;
-            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
-        }
-
-        .login-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 10px 26px rgba(249, 115, 22, 0.6);
-        }
-
-        .logout-btn {
-            background: transparent;
-            color: #fca5a5;
-            border: 1px solid rgba(248, 113, 113, 0.6);
-        }
-
-        .logout-btn:hover {
-            background: rgba(248, 113, 113, 0.15);
-        }
-
-        /* PAGE CONTENT */
-        .page-content {
-            padding: 32px;
-        }
-
-        @@media (max-width: 640px) {
-            .navbar {
-                padding: 12px 18px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="nav-left">
-            <a href="/">BookFinder</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-book"></i> BookFinder
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-house"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Books" asp-action="Index">
+                        <i class="bi bi-collection"></i> Books
+                    </a>
+                </li>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Books" asp-action="Library"
+                            asp-route-userId="@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                            <i class="bi bi-bookmark"></i> My Library
+                        </a>
+                    </li>
+                }
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> @User.Identity.Name
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <button class="dropdown-item" id="logoutBtn">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Auth" asp-action="Login">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Auth" asp-action="Register">
+                            <i class="bi bi-person-plus"></i> Register
+                        </a>
+                    </li>
+                }
+            </ul>
         </div>
+    </div>
+</nav>
 
-        <div class="nav-right">
-            @if (isAuthenticated)
-            {
-                <span class="username">👤 @username</span>
-                <button class="nav-btn logout-btn" onclick="logout()">Logout</button>
-            }
-            else
-            {
-                <a href="/auth/login">
-                    <button class="nav-btn login-btn">Login</button>
-                </a>
-            }
-        </div>
-    </nav>
-
-    <!-- PAGE CONTENT -->
-    <main class="page-content">
-        @RenderBody()
-    </main>
-
+@if (User.Identity?.IsAuthenticated == true)
+{
     <script>
-        async function logout() {
+        document.getElementById('logoutBtn')?.addEventListener('click', async () => {
             try {
-                const res = await fetch('/auth/logout', {
+                const response = await fetch('/auth/logout', {
                     method: 'POST',
-                    credentials: 'include'
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
-                if (res.ok) {
-                    window.location.href = '/auth/login';
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    alert('Logout failed');
                 }
-            } catch (err) {
-                console.error('Logout failed', err);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during logout');
             }
-        }
+        });
     </script>
-
-</body>
-
-</html>
+}
