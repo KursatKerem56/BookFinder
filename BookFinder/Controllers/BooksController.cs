@@ -272,7 +272,7 @@ public class BooksController(IDbConnection db) : Controller
     }
 
     // Insert new library entry into the database
-    var sql = $"INSERT INTO \"UserLibrary\" (\"userId\", \"bookId\", \"progressPages\", \"score\", \"statusid\") VALUES ({UserId}, {BookId}, {Progress}, {Score}, {Condition})";
+    var sql = $"INSERT INTO \"UserLibrary\" (\"userId\", \"bookId\", \"progressPages\", \"score\", \"statusId\") VALUES ({UserId}, {BookId}, {Progress}, {Score}, {Condition})";
     await _db.ExecuteAsync(sql);
 
     return Ok($"Added book {foundBook.title} to user {foundUser.username}'s library.");
