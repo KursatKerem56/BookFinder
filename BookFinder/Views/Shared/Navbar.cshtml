@@ -1,9 +1,66 @@
 @using System.Security.Claims
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<style>
+    .navbar-custom {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 12px 0;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+        font-weight: bold;
+        letter-spacing: 1px;
+        color: white !important;
+    }
+
+    .navbar-brand i {
+        color: #ffd700;
+        font-size: 1.8rem;
+    }
+
+    .nav-link {
+        font-weight: 500;
+        padding: 8px 16px !important;
+        margin: 0 4px;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        color: white !important;
+    }
+
+    .nav-link i {
+        margin-right: 6px;
+    }
+
+    .dropdown-menu {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .auth-link {
+        background: rgba(255, 215, 0, 0.2);
+        border: 2px solid #ffd700;
+        color: #ffd700 !important;
+        font-weight: 600;
+    }
+
+    .auth-link:hover {
+        background: #ffd700;
+        color: #1e3c72 !important;
+        transform: translateY(-2px);
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
     <div class="container-fluid">
-        <a href="/">
-            <i class="bi bi-book"></i> BookFinder
+        <a class="navbar-brand" href="/">
+            <i class="bi bi-book-half"></i> BookFinder
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -11,20 +68,20 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a href="/">
-                        <i class="bi bi-house"></i> Home
+                    <a class="nav-link" href="/">
+                        <i class="bi bi-house-door-fill"></i> Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/books">
-                        <i class="bi bi-collection"></i> Books
+                    <a class="nav-link" href="/books">
+                        <i class="bi bi-collection-fill"></i> Books
                     </a>
                 </li>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <li class="nav-item">
-                        <a href="/books/library/@User.FindFirstValue(ClaimTypes.NameIdentifier)">
-                            <i class="bi bi-bookmark"></i> My Library
+                        <a class="nav-link" href="/books/library/@User.FindFirstValue(ClaimTypes.NameIdentifier)">
+                            <i class="bi bi-bookmark-heart-fill"></i> My Library
                         </a>
                     </li>
                 }
@@ -49,13 +106,8 @@
                 else
                 {
                     <li class="nav-item">
-                        <a href="/auth/login">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/auth/register">
-                            <i class="bi bi-person-plus"></i> Register
+                        <a class="nav-link auth-link" href="/auth">
+                            <i class="bi bi-shield-lock-fill"></i> Auth
                         </a>
                     </li>
                 }
